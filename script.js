@@ -8,10 +8,10 @@ const questions = {
   level2: [
     ["«Մենք ենք, մեր սարերը» ֆիլմում ո՞վ է լեյտենանտի դերակատարը", "Սոս Սարգսյան"],
     ["«Մենք ենք, մեր սարերը» ֆիլմում ո՞վ է Իշխանի դերակատարը", "Մհեր Մկրտչյան"],
-    ["«Մենք ենք, մեր սարերը» ֆիլմում ո՞վ է Պավլեի դերակատար�ը", "Խորեն Աբրահամյան"],
-    ["«Մենք ենք, մեր սարերը» ֆիլմում ո՞վ է Ավագի դերակատար�ը", "Ազատ Շերենց"],
+    ["«Մենք ենք, մեր սարերը» ֆիլմում ո՞վ է Պավլեի դերակատարը", "Խորեն Աբրահամյան"],
+    ["«Մենք ենք, մեր սարերը» ֆիլմում ո՞վ է Ավագի դերակատարը", "Ազատ Շերենց"],
     ["«Մենք ենք, մեր սարերը» ֆիլմում ո՞վ է Զավենի դերակատարը", "Արմեն Այվազյան"],
-    ["«Մենք ենք, մեր սարերը» ֆիլմում ո՞վ է Ռևազի դերակատար�ը", "Արտավազդ Փելեշյան"]
+    ["«Մենք ենք, մեր սարերը» ֆիլմում ո՞վ է Ռևազի դերակատարը", "Արտավազդ Փելեշյան"]
   ],
   level3: [
     ["Ո՞վ է այս խոսքերի հեղինակը «Բա կարծում ես մի մարդով եզ շուռ տալը հե՞շտ է, մի մարդ սկի մի կնիկ էլ չի կարող շուռ տալ, ուր մնաց մի եզ։»", "Իշխան"],
@@ -27,6 +27,13 @@ const questions = {
     ["Ո՞վ է «Հողի դողը» ստեղծագործության հեղինակը", "Լևոն Խեչոյան"],
     ["Ո՞վ է «Թափանցիկ շշեր» ստեղծագործության հեղինակը", "Արամ Պաչյան"],
     ["Ո՞վ է «Նուղը» ստեղծագործության հեղինակը", "Գրիգ"],
+  ],
+  level5: [
+    ["«Հողի Դողը» ստեղծագործությունում ո՞ւմ են բազմիցս փնտրում, բայց չեն կարողանում գտնել", "Սերոբ"],
+    ["Ի՞նչ անմիջական սպառնալիքի առաջ կանգնեցին զինվորները գյուղ մտնելիս «Հողի դողը» ստեղծագործությունում", "Շների հարձակումներ"],
+    ["«Նկուղը» պատմվածքում ո՞վ էր նկուղի «հիմնադիրը և կենտրոնական դեմքը»", "Սամվել"],
+    ["«Մի մարդու քաղաքը» Ի՞նչ էր ծերուկի նախկին մասնագիտությունը", "Օպերային երգիչ"],
+    ["«Ճակատագրի Սև Շունը» վեպում ի՞նչ են ներկայացնում Թինեքի և Թենաֆլիի տները պատմողի ընտանիքի համար", "Խաղաղության ապաստարան"]
   ]
 };
 
@@ -38,6 +45,7 @@ let level1Completed = false;
 let level2Completed = false;
 let level3Completed = false;
 let level4Completed = false;
+let level5Completed = false;
 let userAnswers = [];
 let currentAnswerLength = 0;
 let letterInputs = [];
@@ -51,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('level2-button').addEventListener('click', startLevel2);
   document.getElementById('level3-button').addEventListener('click', startLevel3);
   document.getElementById('level4-button').addEventListener('click', startLevel4);
+  document.getElementById('level5-button').addEventListener('click', startLevel5);
   updateLevelButtons();
 });
 
@@ -86,6 +95,8 @@ function updateLevelButtons() {
   const level2Button = document.getElementById('level2-button');
   const level3Button = document.getElementById('level3-button');
   const level4Button = document.getElementById('level4-button');
+  const level5Button = document.getElementById('level5-button');
+
   
   // Update Level 1 button
   level1Button.classList.toggle('completed', level1Completed);
@@ -110,6 +121,12 @@ function updateLevelButtons() {
   level4Button.disabled = !level3Completed || level4Completed;
   level4Button.style.opacity = level3Completed ? (level4Completed ? '0.7' : '1') : '0.5';
   level4Button.style.cursor = level3Completed && !level4Completed ? 'pointer' : level4Completed ? 'default' : 'not-allowed';
+  
+  // Update Level 5 button
+  level5Button.classList.toggle('completed', level5Completed);
+  level5Button.disabled = !level4Completed || level5Completed;
+  level5Button.style.opacity = level4Completed ? (level5Completed ? '0.7' : '1') : '0.5';
+  level5Button.style.cursor = level4Completed && !level5Completed ? 'pointer' : level5Completed ? 'default' : 'not-allowed';
 }
 
 function startLevel1() {
@@ -160,6 +177,20 @@ function startLevel4() {
   currentIndex = 0;
   correctAnswers = 0;
   userAnswers = Array(questions.level4.length).fill('');
+  loadQuestion();
+  showScreen('level1');
+}
+
+function startLevel5() {
+  if (!level4Completed) {
+    showModal('Խնդրում ենք նախ ավարտել Մակարդակ 4-ը։');
+    return;
+  }
+  if (level5Completed) return;
+  currentLevel = 'level5';
+  currentIndex = 0;
+  correctAnswers = 0;
+  userAnswers = Array(questions.level5.length).fill('');
   loadQuestion();
   showScreen('level1');
 }
@@ -345,8 +376,15 @@ function checkQuiz() {
     else if (currentLevel === 'level2') level2Completed = true;
     else if (currentLevel === 'level3') level3Completed = true;
     else if (currentLevel === 'level4') level4Completed = true;
+    else if (currentLevel === 'level5') level5Completed = true;
     
-    showModal(`Դուք հաջողությամբ ավարտեցիք ${currentLevel === 'level1' ? 'Մակարդակ 1' : currentLevel === 'level2' ? 'Մակարդակ 2' : currentLevel === 'level3' ? 'Մակարդակ 3' : 'Մակարդակ 4'}-ը։`, () => {
+     showModal(`Դուք հաջողությամբ ավարտեցիք ${
+      currentLevel === 'level1' ? 'Մակարդակ 1' : 
+      currentLevel === 'level2' ? 'Մակարդակ 2' : 
+      currentLevel === 'level3' ? 'Մակարդակ 3' : 
+      currentLevel === 'level4' ? 'Մակարդակ 4' : 
+      'Մակարդակ 5'
+    }-ը։`, () => {
       showScreen('level-selection');
     });
   } else {
