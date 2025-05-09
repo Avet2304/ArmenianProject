@@ -22,11 +22,13 @@
     <button id="level3-button" class="level-btn" disabled>Մակարդակ 3</button>
     <button id="level4-button" class="level-btn" disabled>Մակարդակ 4</button>
     <button id="level5-button" class="level-btn" disabled>Մակարդակ 5</button>
+    <button id="restart-game-btn" class="menu-btn hidden" onclick="resetGame()">Վերսկսել Խաղը</button>
   </div>
 
   <!-- Level 1 (used for all levels) -->
   <div id="level1" class="screen hidden">
     <h2 id="question-text"></h2>
+    <div id="timer-display">Ժամանակ: 00:00</div>
     <div id="answer-container"></div>
     
     <div class="nav-buttons">
@@ -42,6 +44,14 @@
     <div id="modal-box">
       <p id="modal-message"></p>
       <button id="modal-button" class="modal-btn">Լավ</button>
+    </div>
+  </div>
+
+  <div id="final-results-modal" class="hidden">
+    <div id="final-results-box">
+      <h2>Շնորհավորում ենք!</h2>
+      <p id="final-results-message"></p>
+      <button id="final-results-button" class="modal-btn">Լավ</button>
     </div>
   </div>
 
