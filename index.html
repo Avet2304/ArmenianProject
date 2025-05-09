@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Armenian Language and Literature 2</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Main Menu -->
+  <div id="main-menu" class="screen">
+    <h1>Armenian Language and Literature 2</h1>
+    <h2>Final Exam</h2>
+    <button class="menu-btn" onclick="showScreen('level-selection')">Սկսել Խաղը</button>
+  </div>
+
+  <!-- Level Selection -->
+  <div id="level-selection" class="screen hidden">
+    <h2>Ընտրել Մակարդակը</h2>
+    <button id="level1-button" class="level-btn">Մակարդակ 1</button>
+    <button id="level2-button" class="level-btn" disabled>Մակարդակ 2</button>
+    <button id="level3-button" class="level-btn" disabled>Մակարդակ 3</button>
+    <button id="level4-button" class="level-btn" disabled>Մակարդակ 4</button>
+  </div>
+
+  <!-- Level 1 (used for all levels) -->
+  <div id="level1" class="screen hidden">
+    <h2 id="question-text"></h2>
+    <div id="answer-container"></div>
+    
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="prevQuestion()">←</button>
+      <button class="nav-btn" onclick="nextQuestion()">→</button>
+    </div>
+    
+    <button class="submit-btn" onclick="submitAnswer()">Հաստատել</button>
+  </div>
+  
+  <!-- Modal Overlay -->
+  <div id="modal-overlay" class="hidden">
+    <div id="modal-box">
+      <p id="modal-message"></p>
+      <button id="modal-button" class="modal-btn">Լավ</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
