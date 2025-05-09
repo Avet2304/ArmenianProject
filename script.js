@@ -41,14 +41,31 @@ let currentLevel = null;
 let currentIndex = 0;
 let correctAnswers = 0;
 let modalCallback = null;
-let level1Completed = false;
-let level2Completed = false;
-let level3Completed = false;
-let level4Completed = false;
-let level5Completed = false;
 let userAnswers = [];
 let currentAnswerLength = 0;
 let letterInputs = [];
+let timerInterval = null;
+let startTime = null;
+let gameState = JSON.parse(localStorage.getItem('gameState')) || {
+  level1Completed: false,
+  level2Completed: false,
+  level3Completed: false,
+  level4Completed: false,
+  level5Completed: false,
+  levelTimes: {
+    level1: 0,
+    level2: 0,
+    level3: 0,
+    level4: 0,
+    level5: 0
+  }
+};
+let level1Completed = gameState.level1Completed;
+let level2Completed = gameState.level2Completed;
+let level3Completed = gameState.level3Completed;
+let level4Completed = gameState.level4Completed;
+let level5Completed = gameState.level5Completed;
+let levelTimes = gameState.levelTimes;
 
 document.addEventListener('DOMContentLoaded', function() {
   setupButtonEffects();
@@ -60,6 +77,10 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('level3-button').addEventListener('click', startLevel3);
   document.getElementById('level4-button').addEventListener('click', startLevel4);
   document.getElementById('level5-button').addEventListener('click', startLevel5);
+  document.getElementById('final-results-button').addEventListener('click', () => {
+    document.getElementById('final-results-modal').classList.add('hidden');
+    showScreen('main-menu');
+  });
   updateLevelButtons();
 });
 
@@ -127,6 +148,13 @@ function updateLevelButtons() {
   level5Button.disabled = !level4Completed || level5Completed;
   level5Button.style.opacity = level4Completed ? (level5Completed ? '0.7' : '1') : '0.5';
   level5Button.style.cursor = level4Completed && !level5Completed ? 'pointer' : level5Completed ? 'default' : 'not-allowed';
+
+  const restartButton = document.getElementById('restart-game-btn');
+  if (level1Completed && level2Completed && level3Completed && level4Completed && level5Completed) {
+    restartButton.classList.remove('hidden');
+  } else {
+    restartButton.classList.add('hidden');
+  }
 }
 
 function startLevel1() {
@@ -135,6 +163,7 @@ function startLevel1() {
   currentIndex = 0;
   correctAnswers = 0;
   userAnswers = Array(questions.level1.length).fill('');
+  startTimer();
   loadQuestion();
   showScreen('level1');
 }
@@ -149,6 +178,7 @@ function startLevel2() {
   currentIndex = 0;
   correctAnswers = 0;
   userAnswers = Array(questions.level2.length).fill('');
+  startTimer();
   loadQuestion();
   showScreen('level1');
 }
@@ -163,6 +193,7 @@ function startLevel3() {
   currentIndex = 0;
   correctAnswers = 0;
   userAnswers = Array(questions.level3.length).fill('');
+  startTimer();
   loadQuestion();
   showScreen('level1');
 }
@@ -177,6 +208,7 @@ function startLevel4() {
   currentIndex = 0;
   correctAnswers = 0;
   userAnswers = Array(questions.level4.length).fill('');
+  startTimer();
   loadQuestion();
   showScreen('level1');
 }
@@ -191,6 +223,7 @@ function startLevel5() {
   currentIndex = 0;
   correctAnswers = 0;
   userAnswers = Array(questions.level5.length).fill('');
+  startTimer();
   loadQuestion();
   showScreen('level1');
 }
@@ -372,21 +405,37 @@ function checkQuiz() {
   }
 
   if (correctAnswers === questions[currentLevel].length) {
-    if (currentLevel === 'level1') level1Completed = true;
-    else if (currentLevel === 'level2') level2Completed = true;
-    else if (currentLevel === 'level3') level3Completed = true;
-    else if (currentLevel === 'level4') level4Completed = true;
-    else if (currentLevel === 'level5') level5Completed = true;
-    
-     showModal(`Դուք հաջողությամբ ավարտեցիք ${
-      currentLevel === 'level1' ? 'Մակարդակ 1' : 
-      currentLevel === 'level2' ? 'Մակարդակ 2' : 
-      currentLevel === 'level3' ? 'Մակարդակ 3' : 
-      currentLevel === 'level4' ? 'Մակարդակ 4' : 
-      'Մակարդակ 5'
-    }-ը։`, () => {
-      showScreen('level-selection');
-    });
+    const elapsedTime = stopTimer();
+    if (currentLevel === 'level1') {
+      level1Completed = true;
+      levelTimes.level1 = elapsedTime;
+    } else if (currentLevel === 'level2') {
+      level2Completed = true;
+      levelTimes.level2 = elapsedTime;
+    } else if (currentLevel === 'level3') {
+      level3Completed = true;
+      levelTimes.level3 = elapsedTime;
+    } else if (currentLevel === 'level4') {
+      level4Completed = true;
+      levelTimes.level4 = elapsedTime;
+    } else if (currentLevel === 'level5') {
+      level5Completed = true;
+      levelTimes.level5 = elapsedTime;
+    }
+    saveGameState();
+    if (level1Completed && level2Completed && level3Completed && level4Completed && level5Completed) {
+      showFinalResults();
+    } else {
+      showModal(`Դուք հաջողությամբ ավարտեցիք ${
+        currentLevel === 'level1' ? 'Մակարդակ 1' : 
+        currentLevel === 'level2' ? 'Մակարդակ 2' : 
+        currentLevel === 'level3' ? 'Մակարդակ 3' : 
+        currentLevel === 'level4' ? 'Մակարդակ 4' : 
+        'Մակարդակ 5'
+      }-ը։ Ժամանակ: ${formatTime(elapsedTime)}`, () => {
+        showScreen('level-selection');
+      });
+    }
   } else {
     currentIndex = 0;
     showModal(`Դուք պատասխանել եք ${correctAnswers} ${correctAnswers === 1 ? 'հարցին' : 'հարցերին'} ճիշտ ${questions[currentLevel].length}-ից։ Վերանայեք Ձեր պատասխանները։`, () => {
@@ -408,4 +457,78 @@ function handleModalAction() {
     modalCallback();
   }
   modalCallback = null;
+}
+
+function startTimer() {
+  startTime = Date.now();
+  timerInterval = setInterval(updateTimer, 1000);
+}
+
+function updateTimer() {
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+  const seconds = (elapsed % 60).toString().padStart(2, '0');
+  document.getElementById('timer-display').textContent = `Ժամանակ: ${minutes}:${seconds}`;
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  return elapsed;
+}
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function showFinalResults() {
+  const totalSeconds = Object.values(levelTimes).reduce((sum, time) => sum + time, 0);
+  const message = `
+    Դուք ավարտեցիք բոլոր մակարդակները:<br>
+    Մակարդակ 1: ${formatTime(levelTimes.level1)}<br>
+    Մակարդակ 2: ${formatTime(levelTimes.level2)}<br>
+    Մակարդակ 3: ${formatTime(levelTimes.level3)}<br>
+    Մակարդակ 4: ${formatTime(levelTimes.level4)}<br>
+    Մակարդակ 5: ${formatTime(levelTimes.level5)}<br>
+    Ընդհանուր ժամանակ: ${formatTime(totalSeconds)}
+  `;
+  document.getElementById('final-results-message').innerHTML = message;
+  document.getElementById('final-results-modal').classList.remove('hidden');
+  document.getElementById('final-results-button').focus();
+}
+
+function saveGameState() {
+  gameState = {
+    level1Completed,
+    level2Completed,
+    level3Completed,
+    level4Completed,
+    level5Completed,
+    levelTimes
+  };
+  localStorage.setItem('gameState', JSON.stringify(gameState));
+}
+
+function resetGame() {
+  localStorage.removeItem('gameState');
+  level1Completed = false;
+  level2Completed = false;
+  level3Completed = false;
+  level4Completed = false;
+  level5Completed = false;
+  levelTimes = {
+    level1: 0,
+    level2: 0,
+    level3: 0,
+    level4: 0,
+    level5: 0
+  };
+  saveGameState();
+  updateLevelButtons();
+  showScreen('main-menu');
 }
