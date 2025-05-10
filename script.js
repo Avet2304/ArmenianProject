@@ -264,6 +264,7 @@ function createLetterInputs(answer) {
       input.maxLength = 1;
       input.className = 'letter-input';
       input.dataset.index = globalIndex;
+      input.autocapitalize = 'none'; // Disable auto-capitalization
       input.autocorrect = 'off'; // Disable autocorrect
       input.spellcheck = false; // Disable spellcheck
 
