@@ -264,6 +264,8 @@ function createLetterInputs(answer) {
       input.maxLength = 1;
       input.className = 'letter-input';
       input.dataset.index = globalIndex;
+      input.autocorrect = 'off'; // Disable autocorrect
+      input.spellcheck = false; // Disable spellcheck
 
       input.addEventListener('input', function(e) {
         const index = parseInt(this.dataset.index);
