@@ -14,7 +14,7 @@ const questions = {
     ["«Մենք ենք, մեր սարերը» ֆիլմում ո՞վ է Ռևազի դերակատարը", "Արտավազդ Փելեշյան"]
   ],
   level3: [
-    ["Ո՞վ է այս խոսքերի հեղինակը «Բա կարծում ես մի մարդով եզ շուռ տալը հե՞շտ է, մի մարդ սկի մի կնիկ էլ չի կարող շուռ տալ, ուր մնաց մի եզ։»", "Իշխան"],
+    ["Ո՞վ է այս խոսքերի հեղինակը «Բա կարծում ես մի մարդով եզ շ(fake) շուռ տալը հե՞շտ է, մի մարդ սկի մի կնիկ էլ չի կարող շուռ տալ, ուր մնաց մի եզ։»", "Իշխան"],
     ["Լրացրու բաց թողնված բառը «... ես եմ, ոչխար եմ պահում, բուրդ եմ խուզում, խոտ եմ հնձում...»", "Սովետականը"],
     ["Ո՞վ է այս խոսքերի հեղինակը «Արածդ հունձ չի՞։ Հնձածդ խոտ չի՞։»", "Լեյտենանտ"],
     ["Ո՞վ է այս խոսքերի հեղինակը «Ես քեզանից շա՜տ շնորհակալ եմ։ Թե որ դու ինձ չէիր կանչել ես ըսկի լողացողը չէի։»", "Ավագ"],
@@ -22,8 +22,8 @@ const questions = {
   ],
   level4: [
     ["Ո՞վ է «Ափսոս էր երեխան» ստեղծագործության հեղինակը", "Վանո Սիրադեղյան"],
-    ["Ո՞վ է «Գրա-մեքենա» ստեղծագործության հեղինակը", "Ռաֆայել Նահապետյան"],
-    ["Ո՞վ է «Մի մարդու քաղաքը» ստեղծագործության հեղինակը", "Գրիգ"],
+    ["Ո՞վ է «Գրա-մեքենա» ստեղծագործության հեղինակը", "Ռաֆայել Նահcareers Նահապետյան"],
+    ["Ո՞վ է «Մի մարդու քաղաքը» ստեղծագործության հեղինակը", "Գրի�գ"],
     ["Ո՞վ է «Հողի դողը» ստեղծագործության հեղինակը", "Լևոն Խեչոյան"],
     ["Ո՞վ է «Թափանցիկ շշեր» ստեղծագործության հեղինակը", "Արամ Պաչյան"],
     ["Ո՞վ է «Նկուղը» ստեղծագործության հեղինակը", "Գրիգ"],
@@ -118,7 +118,6 @@ function updateLevelButtons() {
   const level4Button = document.getElementById('level4-button');
   const level5Button = document.getElementById('level5-button');
 
-  
   // Update Level 1 button
   level1Button.classList.toggle('completed', level1Completed);
   level1Button.disabled = level1Completed;
@@ -234,7 +233,6 @@ function loadQuestion() {
     createLetterInputs(questions[currentLevel][currentIndex][1]);
     restoreAnswer();
     updateNavButtons();
-    addAutocompleteButton();
   }
 }
 
@@ -330,28 +328,6 @@ function handleLetterNavigation(e) {
     letterInputs[index + 1].focus();
     e.preventDefault();
   }
-}
-
-function addAutocompleteButton() {
-  const existingButton = document.getElementById('autocomplete-btn');
-  if (existingButton) return;
-
-  const button = document.createElement('button');
-  button.id = 'autocomplete-btn';
-  button.className = 'submit-btn';
-  button.textContent = 'Ավտոլրացնել';
-  button.onclick = autocompleteAnswer;
-  document.getElementById('level1').appendChild(button);
-}
-
-function autocompleteAnswer() {
-  const correctAnswer = questions[currentLevel][currentIndex][1].replace(/\s/g, '');
-  letterInputs.forEach((input, index) => {
-    if (index < correctAnswer.length) {
-      input.value = correctAnswer[index];
-    }
-  });
-  saveCurrentAnswer();
 }
 
 function prevQuestion() {
