@@ -14,7 +14,7 @@ const questions = {
     ["«Մենք ենք, մեր սարերը» ֆիլմում ո՞վ է Ռևազի դերակատարը", "Արտավազդ Փելեշյան"]
   ],
   level3: [
-    ["Ո՞վ է այս խոսքերի հեղինակը «Բա կարծում ես մի մարդով եզ շ(fake) շուռ տալը հե՞շտ է, մի մարդ սկի մի կնիկ էլ չի կարող շուռ տալ, ուր մնաց մի եզ։»", "Իշխան"],
+    ["Ո՞վ է այս խոսքերի հեղինակը «Բա կարծում ես մի մարդով եզ շուռ տալը հե՞շտ է, մի մարդ սկի մի կնիկ էլ չի կարող շուռ տալ, ուր մնաց մի եզ։»", "Իշխան"],
     ["Լրացրու բաց թողնված բառը «... ես եմ, ոչխար եմ պահում, բուրդ եմ խուզում, խոտ եմ հնձում...»", "Սովետականը"],
     ["Ո՞վ է այս խոսքերի հեղինակը «Արածդ հունձ չի՞։ Հնձածդ խոտ չի՞։»", "Լեյտենանտ"],
     ["Ո՞վ է այս խոսքերի հեղինակը «Ես քեզանից շա՜տ շնորհակալ եմ։ Թե որ դու ինձ չէիր կանչել ես ըսկի լողացողը չէի։»", "Ավագ"],
@@ -22,11 +22,11 @@ const questions = {
   ],
   level4: [
     ["Ո՞վ է «Ափսոս էր երեխան» ստեղծագործության հեղինակը", "Վանո Սիրադեղյան"],
-    ["Ո՞վ է «Գրա-մեքենա» ստեղծագործության հեղինակը", "Ռաֆայել Նահcareers Նահապետյան"],
-    ["Ո՞վ է «Մի մարդու քաղաքը» ստեղծագործության հեղինակը", "Գրի�գ"],
+    ["Ո՞վ է «Գրա-մեքենա» ստեղծագործության հեղինակը", "Ռաֆայել Նահապետյան"],
+    ["Ո՞վ է «Մի մարդու քաղաքը» ստեղծագործության հեղինակը", "Գրիգ"],
     ["Ո՞վ է «Հողի դողը» ստեղծագործության հեղինակը", "Լևոն Խեչոյան"],
     ["Ո՞վ է «Թափանցիկ շշեր» ստեղծագործության հեղինակը", "Արամ Պաչյան"],
-    ["Ո՞վ է «Նկուղը» ստեղծագործության հեղինակը", "Գրիգ"],
+    ["Ո՞վ է «Նկուղը» ստեղծագործության հեղինակը", "Գրիգ"]
   ],
   level5: [
     ["«Հողի դողը» ստեղծագործության մեջ ո՞ւմ են բազմիցս փնտրում, բայց չեն կարողանում գտնել", "Սերոբ"],
@@ -58,7 +58,12 @@ let gameState = JSON.parse(localStorage.getItem('gameState')) || {
     level3: 0,
     level4: 0,
     level5: 0
-  }
+  },
+  currentScreen: 'main-menu',
+  currentLevel: null,
+  currentIndex: 0,
+  userAnswers: [],
+  timerStartTime: null
 };
 let level1Completed = gameState.level1Completed;
 let level2Completed = gameState.level2Completed;
@@ -66,10 +71,13 @@ let level3Completed = gameState.level3Completed;
 let level4Completed = gameState.level4Completed;
 let level5Completed = gameState.level5Completed;
 let levelTimes = gameState.levelTimes;
+currentLevel = gameState.currentLevel;
+currentIndex = gameState.currentIndex;
+userAnswers = gameState.userAnswers;
+startTime = gameState.timerStartTime;
 
 document.addEventListener('DOMContentLoaded', function() {
   setupButtonEffects();
-  showScreen('main-menu');
   document.getElementById('modal-overlay').classList.add('hidden');
   document.getElementById('modal-button').addEventListener('click', handleModalAction);
   document.getElementById('level1-button').addEventListener('click', startLevel1);
@@ -82,6 +90,18 @@ document.addEventListener('DOMContentLoaded', function() {
     showScreen('main-menu');
   });
   updateLevelButtons();
+  // Restore the saved screen and state
+  if (gameState.currentScreen === 'level1' && currentLevel && questions[currentLevel]) {
+    // Initialize userAnswers if not set or incorrect length for the current level
+    if (!userAnswers || userAnswers.length !== questions[currentLevel].length) {
+      userAnswers = Array(questions[currentLevel].length).fill('');
+    }
+    // Resume timer if in a level
+    startTimer();
+    showScreen('level1');
+  } else {
+    showScreen(gameState.currentScreen || 'main-menu');
+  }
 });
 
 function setupButtonEffects() {
@@ -109,6 +129,10 @@ function showScreen(id) {
   if (id === 'level1') {
     loadQuestion();
   }
+
+  // Save the current screen to gameState
+  gameState.currentScreen = id;
+  saveGameState();
 }
 
 function updateLevelButtons() {
@@ -165,6 +189,7 @@ function startLevel1() {
   startTimer();
   loadQuestion();
   showScreen('level1');
+  saveGameState();
 }
 
 function startLevel2() {
@@ -180,6 +205,7 @@ function startLevel2() {
   startTimer();
   loadQuestion();
   showScreen('level1');
+  saveGameState();
 }
 
 function startLevel3() {
@@ -195,6 +221,7 @@ function startLevel3() {
   startTimer();
   loadQuestion();
   showScreen('level1');
+  saveGameState();
 }
 
 function startLevel4() {
@@ -210,6 +237,7 @@ function startLevel4() {
   startTimer();
   loadQuestion();
   showScreen('level1');
+  saveGameState();
 }
 
 function startLevel5() {
@@ -225,6 +253,7 @@ function startLevel5() {
   startTimer();
   loadQuestion();
   showScreen('level1');
+  saveGameState();
 }
 
 function loadQuestion() {
@@ -278,6 +307,7 @@ function createLetterInputs(answer) {
             });
           }, 10);
         }
+        saveCurrentAnswer(); // Save answer on input
       });
 
       input.addEventListener('keydown', handleLetterNavigation);
@@ -317,6 +347,7 @@ function handleLetterNavigation(e) {
       letterInputs[index - 1].value = '';
       letterInputs[index - 1].focus();
     }
+    saveCurrentAnswer(); // Save answer on backspace/delete
     e.preventDefault();
     return;
   }
@@ -334,17 +365,20 @@ function prevQuestion() {
   saveCurrentAnswer();
   currentIndex--;
   loadQuestion();
+  saveGameState();
 }
 
 function nextQuestion() {
   saveCurrentAnswer();
   currentIndex++;
   loadQuestion();
+  saveGameState();
 }
 
 function saveCurrentAnswer() {
   userAnswers[currentIndex] = letterInputs.map(input => input.value).join('');
   console.log(`Saved answer for question ${currentIndex + 1}: ${userAnswers[currentIndex]}`);
+  saveGameState();
 }
 
 function updateNavButtons() {
@@ -368,6 +402,7 @@ function submitAnswer() {
   currentIndex++;
   if (currentIndex < questions[currentLevel].length) {
     loadQuestion();
+    saveGameState();
   } else {
     checkQuiz();
   }
@@ -439,11 +474,29 @@ function handleModalAction() {
 }
 
 function startTimer() {
-  startTime = Date.now();
+  // Clear any existing timer to prevent multiple intervals
+  if (timerInterval) {
+    clearInterval(timerInterval);
+  }
+  // Use saved startTime if valid, otherwise set new startTime
+  if (!startTime || isNaN(startTime) || startTime <= 0) {
+    startTime = Date.now();
+    console.log('Starting new timer with startTime:', startTime);
+  } else {
+    console.log('Resuming timer with startTime:', startTime);
+  }
+  // Start the timer interval
   timerInterval = setInterval(updateTimer, 1000);
+  // Immediately update the display to avoid 1-second delay
+  updateTimer();
+  saveGameState();
 }
 
 function updateTimer() {
+  if (!startTime) {
+    console.warn('updateTimer called with no startTime, resetting timer');
+    startTime = Date.now();
+  }
   const elapsed = Math.floor((Date.now() - startTime) / 1000);
   const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
   const seconds = (elapsed % 60).toString().padStart(2, '0');
@@ -454,8 +507,12 @@ function stopTimer() {
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
+    console.log('Timer stopped');
   }
-  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+  startTime = null; // Clear startTime
+  gameState.timerStartTime = null; // Clear from gameState
+  saveGameState();
   return elapsed;
 }
 
@@ -488,7 +545,12 @@ function saveGameState() {
     level3Completed,
     level4Completed,
     level5Completed,
-    levelTimes
+    levelTimes,
+    currentScreen: gameState.currentScreen || 'main-menu',
+    currentLevel,
+    currentIndex,
+    userAnswers,
+    timerStartTime: startTime
   };
   localStorage.setItem('gameState', JSON.stringify(gameState));
 }
@@ -507,7 +569,24 @@ function resetGame() {
     level4: 0,
     level5: 0
   };
+  currentLevel = null;
+  currentIndex = 0;
+  userAnswers = [];
+  startTime = null;
+  gameState = {
+    level1Completed,
+    level2Completed,
+    level3Completed,
+    level4Completed,
+    level5Completed,
+    levelTimes,
+    currentScreen: 'main-menu',
+    currentLevel,
+    currentIndex,
+    userAnswers,
+    timerStartTime: null
+  };
   saveGameState();
   updateLevelButtons();
   showScreen('main-menu');
-}
+} 
